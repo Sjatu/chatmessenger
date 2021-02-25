@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/img/favicon2.png">
+    <link href='/css/style.css' rel="stylesheet">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
+    <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src='/socket.io/socket.io.js'></script>
+    <script defer src='/js/chat.js'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script defer src="https://code.jquery.com/jquery-3.3.1.slim.min.js" type=""></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+        type="">
+    </script>
+
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css'>
+    <title>Chat Messenger App - For Group & Private Chats</title>
+</head>
+
+<body>
+
+    <div class="container py-3" style="background-color:rgba(0,0,0,0);">
+        <!-- Header -->
+        <div class="row justify-content-md-center text-center py-3">
+            <div class="col col-md-auto">
+                <img class="col-xs-auto px-0" style="max-height: 100px;" src="/img/favicon.png">
+            </div>
+            <div class="col-md-auto px-0">
+                <h1 class="display-4 text-white">Chat Messenger</h1>
+                <p class="text-white lead h2 mb-4"><span class="small"> Snippet by</span>
+                    <a href="#" id="myPortfolioLink" class="text-white h4"
+                        style="border-bottom: 1px dotted white;">Saurabh Jatu</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="container col-md-8 mt-3 px-0">
+
+        <!-- Chat box container -->
+        <div class="row shadow m-auto" id="chatContainer">
+
+            <!-- Users name box-->
+            <div class="col-lg-4 px-0" style="background-color:rgba(255,255,255,0.125);">
+                <div class="">
+
+                    <div class="bg-gray px-3 py-4 border-0" style="background-color:rgba(0,0,0,0.7);">
+                        <i class="fa text-light fa-3x fa-home pr-3 float-left" aria-hidden="true"></i>
+                        <p class="h4 mb-0 py-1 text-light mt-2 ml-5" id="roomName"></p>
+                    </div>
+
+                    <div class="bg-gray px-3 py-3" style="background-color:rgba(0,0,0,0.6);">
+                        <i class="fa text-white fa-2x fa-users float-left" aria-hidden="true"></i>
+                        <p class="h6 mb-0 py-1 text-white ml-5">Active Users
+                            <span id="activeUsersCount"></span>
+                        </p>
+                    </div>
+
+                    <div class="messages-box">
+                        <div class="list-group rounded-0">
+                            <div class="list-group-item border-0 rounded-0" style="background-color:#4cd3f9;">
+                                <i class="fa text-light fa-2x fa-user float-left" aria-hidden="true"></i>
+                                <h6 id="handleName" class="ml-3 mt-1 text-white float-left"></h6>
+                            </div>
+                        </div>
+                        <div class="list-group rounded-0 overflow-scroll" id="sidebar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 px-0" style="background-color: rgba(255,255,255,0.1);">
+                <div id="messages" class="overflow-auto message-container pt-5">
+
+                    <!-- Reciever Message-->
+                    <div class="media w-50">
+                        <div class="media-body ml-3"></div>
+                    </div>
+
+                    <!-- Sender Message-->
+                    <div class="media w-50 ml-auto">
+                        <div class="media-body"></div>
+                    </div>
+
+                </div>
+
+                <!-- Typing Message-->
+                <div id="feedback" class="text-small px-3 font-italic" style="color:#dfe6e9;">
+                </div>
+
+                <!-- message input form -->
+                <form id="message-form" class=" form-inline">
+                    <div class="input-group col px-0">
+                        <input type="text" name="" id="messageText" placeholder="Enter message..."
+                            class="form-control rounded-0 border-0 py-3" required autocomplete="off">
+                    </div>
+                    <label class="sendTo form-label px-2 py-2">Send To : </label>
+                    <select id="sendTo" class="sendSelectBtn form-select px-2 py-2 rounded-0">
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" id="send-message" class="btn btn-link"><i class="fa fa-paper-plane"
+                                style="color:#4cd3f9;"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Username input area -->
+        <div class="row justify-content-md-center m-auto" id="userNameContainer">
+            <div id="nickWrap" class="col-md-6 px-0 mb-5 mt-5 text-center">
+                <i class="fa fa-5x fa-user mb-3" style="color:#4cd3f9;" aria-hidden="true"></i>
+                <form id="userForm" class="text-center">
+                    <fieldset>
+
+                        <input type="text" id="userNameForm1" style="height:60px"
+                            class="form-control rounded-0 text-center border-0 py-4 bg-light" required
+                            autocomplete="off" placeholder="Enter Username..." maxlength="10" minlength="3">
+
+                        <input type="text" id="roomNameForm1" style="height:60px"
+                            class="form-control rounded-0 text-center border-0 py-4 bg-light" required
+                            autocomplete="off" placeholder="Enter Room Name..." maxlength="15" minlength="3">
+
+                        <button type="submit" class="btn rounded-0 py-4 px-4 btn-link mt-3"><i
+                                class="fa fa-fw fa-2x fa-paper-plane" style="color:#4cd3f9;"></i></button>
+                    </fieldset>
+                    <p class="text-danger font-weight-bold" id="nickError"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer" class="container-fluid fixed py-5 mt-5">
+        <div class="row justify-content-md-center text-center py-3 mt-4">
+            <div id="social" class="col">
+                <a target="_blank" href="https://www.facebook.com/"><i class="fa fa-fw fa-facebook"></i></a>
+                <a target="_blank" href="https://www.twitter.com/"><i class="fa fa-fw  fa-twitter"></i></a>
+                <a target="_blank" href="https://plus.google.com/"><i class="fa fa-fw  fa-google-plus"></i></a>
+                <a target="_blank" href="https://www.linkedin.com/"><i class="fa fa-fw fa-linkedin"></i></a>
+                <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-fw fa-instagram"></i></a>
+                <a target="_blank" href="https://www.youtube.com/"><i class="fa fa-fw fa-youtube"></i></a>
+                <a target="_blank" href="https://www.vimeo.com/"><i class="fa fa-fw fa-vimeo-square"></i></a>
+                <a target="_blank" href="https://www.tumblr.com/"><i class="fa fa-fw fa-tumblr"></i></a>
+                <a target="_blank" href="https://www.dribbble.com/"><i class="fa fa-fw fa-dribbble"></i></a>
+                <a target="_blank" href="https://www.behance.com/"><i class="fa fa-fw fa-behance"></i></a>
+                <a target="_blank" href="https://www.flickr.com/"><i class="fa fa-fw fa-flickr"></i></a>
+                <a target="_blank" href="https://www.github.com/"><i class="fa fa-fw fa-github"></i></a>
+            </div>
+        </div>
+        <div class="row justify-content-md-center text-center py-3">
+            <div id="navs" class="col">
+                <a title="About" href="#"><i class="fa fa-fw fa-3x fa-info-circle"></i></a>
+                <a title="Home" href="#"><i class="fa fa-fw fa-3x fa-home"></i></a>
+                <a title="Help" href="#"><i class="fa fa-fw fa-3x fa-file-text-o"></i></a>
+
+            </div>
+        </div>
+        <div class="row justify-content-md-center text-center py-3">
+            <div class="col">
+                <a href="#" title="Chat Messenger" style="text-decoration: none;">
+                    <img class="px-0" style="max-height: 40px;" src="/img/favicon.png">
+                    <h5 class="text-white mt-2">Chat Messenger</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
