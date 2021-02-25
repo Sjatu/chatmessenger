@@ -35,25 +35,27 @@ io.on('connection' , (socket) => {
     })
 
     socket.on('sendMessage' , ({message,sendTo} , callback) => {
-        const user = getUser(socket.id)
+        if (message) {
+            const user = getUser(socket.id)
 
-        const filter = new Filter()
-        if(filter.isProfane(message)) {
-            return callback({username:'Admin', message: 'Profanity is not allowed!'})
-        }
+            const filter = new Filter()
+            if(filter.isProfane(message)) {
+                return callback({username:'Admin', message: 'Profanity is not allowed!'})
+            }
 
-        var msg = message.trim()
-        if(user) {
-            if (sendTo) {
-                const userTo = getUserByName(sendTo)
-                io.to(userTo.id).emit('whisper', generateMessage(`[${user.username}] `,msg))
-                socket.emit( 'whisper' , generateMessage('You',`[${userTo.username}] : ${msg}`) )
+            var msg = message.trim()
+            if(user) {
+                if (sendTo) {
+                    const userTo = getUserByName(sendTo)
+                    io.to(userTo.id).emit('whisper', generateMessage(`[${user.username}] `,msg))
+                    socket.emit( 'whisper' , generateMessage('You',`[${userTo.username}] : ${msg}`) )
+                }
+                else {
+                    socket.broadcast.to( user.room ).emit('receive' , generateMessage(user.username,message))
+                    callback({username:'You', message})    
+                }
             }
-            else {
-                socket.broadcast.to( user.room ).emit('receive' , generateMessage(user.username,message))
-                callback({username:'You', message})    
-            }
-        }
+       }
     })
 
     socket.on('typing', (data) => {
